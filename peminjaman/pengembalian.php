@@ -135,7 +135,6 @@ $resultPengembalian = $conn->query("SELECT p.*, g.nama_barang FROM pengembalian 
 <div class="sidebar">
     <h4 class="text-center mb-4">Pengembalian</h4>
     <a href="dashboard.php">Dashboard</a>
-    <a href="gudang.php">Manajemen Barang</a>
     <a href="peminjaman.php">Peminjaman</a>
     <a href="pengembalian.php">Pengembalian</a>
     <a href="../index.php">Home</a>
@@ -242,13 +241,69 @@ $resultPengembalian = $conn->query("SELECT p.*, g.nama_barang FROM pengembalian 
         </tbody>
     </table>
 </div>
-<!-- Tombol Ekspor ke Excel -->
-<div class="mt-4">
+     <!-- Ekspor Excel -->
+<div class="card mt-4 p-4 shadow">
+    <h5 class="mb-3">Ekspor Data Peminjaman</h5>
     <form method="POST" action="export.php">
-        <button type="submit" name="export" class="btn btn-primary">Ekspor ke Excel</button>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Pilih Tipe Ekspor</label>
+                <select name="export_type" class="form-select" required>
+                    <option value="daily">Harian</option>
+                    <option value="monthly">Bulanan</option>
+                    <option value="yearly">Tahunan</option>
+                </select>
+            </div>
+            <div class="col-md-4" id="date-picker">
+                <label class="form-label">Tanggal</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-md-4" id="month-picker" style="display: none;">
+                <label class="form-label">Bulan</label>
+                <select name="month" class="form-select" required>
+                    <?php
+                    for ($m = 1; $m <= 12; $m++) {
+                        echo "<option value='$m'>" . date("F", mktime(0, 0, 0, $m, 1)) . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-4" id="year-picker-month" style="display: none;">
+                <label class="form-label">Tahun</label>
+                <select name="year_month" class="form-select" required>
+                    <?php
+                    for ($y = date("Y"); $y >= 2000; $y--) {
+                        echo "<option value='$y'>$y</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-4" id="year-picker" style="display: none;">
+                <label class="form-label">Tahun</label>
+                <select name="year" class="form-select" required>
+                    <?php
+                    for ($y = date("Y"); $y >= 2000; $y--) {
+                        echo "<option value='$y'>$y</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Ekspor</button>
+            </div>
+        </div>
     </form>
 </div>
 
+<script>
+    document.querySelector('select[name="export_type"]').addEventListener('change', function() {
+        const value = this.value;
+        document.getElementById('date-picker').style.display = value === 'daily' ? 'block' : 'none';
+        document.getElementById('month-picker').style.display = value === 'monthly' ? 'block' : 'none';
+        document.getElementById('year-picker-month').style.display = value === 'monthly' ? 'block' : 'none';
+        document.getElementById('year-picker').style.display = value === 'yearly' ? 'block' : 'none';
+    });
+</script>
 <!-- Bootstrap 5 & DataTables -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>

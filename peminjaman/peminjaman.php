@@ -229,7 +229,6 @@ $result_kasir = $conn->query("SELECT * FROM kasir");
 <div class="sidebar">
     <h4 class="text-center mb-4">Peminjaman</h4>
     <a href="dashboard.php">Dashboard</a>
-    <a href="gudang.php">Manajemen Barang</a>
     <a href="peminjaman.php">Peminjaman</a>
     <a href="pengembalian.php">Pengembalian</a>
     <a href="../index.php">Home</a>

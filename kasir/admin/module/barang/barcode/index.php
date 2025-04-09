@@ -16,6 +16,14 @@ function generateRandomBarcode($length = 8) {
     return str_pad(rand(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
 }
 
+// Fungsi untuk memastikan barcode unik
+function ensureUniqueBarcode($config, $barcode) {
+    $sql = "SELECT COUNT(*) FROM barang WHERE kode_barcode = ?";
+    $stmt = $config->prepare($sql);
+    $stmt->execute([$barcode]);
+    return $stmt->fetchColumn() == 0; // Mengembalikan true jika barcode unik
+}
+
 $status = "";
 
 // Proses update atau generate barcode baru
@@ -36,7 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (isset($_POST['create_barcode'])) {
-        $kode_barcode = generateRandomBarcode();
+        do {
+            $kode_barcode = generateRandomBarcode();
+        } while (!ensureUniqueBarcode($config, $kode_barcode)); // Pastikan barcode unik
+
         $sql = "UPDATE barang SET kode_barcode = ? WHERE id_barang = ?";
         $stmt = $config->prepare($sql);
         $stmt->execute([$kode_barcode, $id_barang]);

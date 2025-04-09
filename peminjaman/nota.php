@@ -66,7 +66,7 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
                 <th>Jumlah</th>
                 <th>Harga</th>
                 <th>Total Harga</th>
-                <th>Kode Unik</th>
+                <th>ID Peminjaman</th> <!-- Ganti Kode Unik menjadi ID Peminjaman -->
                 <th>Tenggat Waktu</th>
             </tr>
             <?php 
@@ -75,7 +75,7 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
                 $id_barang = $row_peminjaman['id_barang'];
                 $jumlah = $row_peminjaman['jumlah'];
                 $tenggat_waktu = $row_peminjaman['tenggat_waktu'];
-                $kode_unik = $row_peminjaman['kode_unik'];
+                $id_peminjaman = $row_peminjaman['id']; // Ambil ID Peminjaman
 
                 // Fetch item details from kasir based on id_barang
                 $result_kasir = $conn->query("SELECT nama_barang, harga FROM kasir WHERE id_barang = '$id_barang'");
@@ -94,7 +94,7 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
                     echo "<td>$jumlah</td>";
                     echo "<td>Rp " . number_format($harga, 2, ',', '.') . "</td>";
                     echo "<td>Rp " . number_format($total_harga, 2, ',', '.') . "</td>";
-                    echo "<td>$kode_unik</td>"; // Display kode unik
+                    echo "<td>$id_peminjaman</td>"; // Display ID Peminjaman
                     echo "<td>$tenggat_waktu</td>"; // Display tenggat waktu
                     echo "</tr>";
                 }

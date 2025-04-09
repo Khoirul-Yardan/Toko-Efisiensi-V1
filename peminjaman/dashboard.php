@@ -1,6 +1,11 @@
 <?php
 require 'koneksi.php';
 
+// Ambil password dari database
+$result = $conn->query("SELECT password FROM settings LIMIT 1");
+$row = $result->fetch_assoc();
+$hashed_password = $row['password']; // Password yang di-hash dari database
+
 // Data statistik utama
 $total_barang = $conn->query("SELECT COUNT(*) AS total FROM gudang")->fetch_assoc()['total'];
 $dipinjam = $conn->query("SELECT COUNT(*) AS total FROM peminjaman WHERE status='Dipinjam'")->fetch_assoc()['total'];
@@ -39,6 +44,7 @@ $keuntungan = $conn->query("
     <title>Dashboard Gudang</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             display: flex;
@@ -79,10 +85,10 @@ $keuntungan = $conn->query("
 <div class="sidebar">
     <h4 class="text-center mb-4">DASHBOARD</h4>
     <a href="dashboard.php">Dashboard</a>
-    <a href="gudang.php">Manajemen Barang</a>
+    <a href="#" class="open-modal" data-page="gudang">Manajemen Barang</a>
     <a href="peminjaman.php">Peminjaman</a>
     <a href="pengembalian.php">Pengembalian</a>
-    <a href="setting.php">Settings</a>
+    <a href="#" class="open-modal" data-page="setting">Settings</a>
     <a href="../index.php">Home</a>
 </div>
 
@@ -104,7 +110,7 @@ $keuntungan = $conn->query("
                 <h3><?= $dipinjam ?></h3>
             </div>
         </div>
-        <div class="col-md-3 col-sm- 6">
+        <div class="col-md-3 col-sm-6">
             <div class="card p-3 text-white bg-success">
                 <h5>Dikembalikan</h5>
                 <h3><?= $dikembalikan ?></h3>
@@ -179,6 +185,31 @@ const barangChart = new Chart(ctx, {
             }
         }
     }
+});
+
+document.querySelectorAll('.open-modal').forEach(item => {
+    item.addEventListener('click', function() {
+        const page = this.getAttribute('data-page');
+        Swal.fire({
+            title: 'Masukkan Password',
+            input: 'password',
+            inputLabel: 'Password',
+            inputPlaceholder: 'Masukkan password',
+            showCancelButton: true,
+            confirmButtonText: 'Masuk',
+            cancelButtonText: 'Batal',
+            preConfirm: (password) => {
+                return new Promise((resolve) => {
+                    // Verifikasi password
+                    if (password === '<?= $hashed_password ?>') {
+                        window.location.href = page + '.php'; // Redirect ke halaman yang diminta
+                    } else {
+                        Swal.showValidationMessage('Password salah!');
+                    }
+                });
+            }
+        });
+    });
 });
 </script>
 
