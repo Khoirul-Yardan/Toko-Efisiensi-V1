@@ -239,21 +239,24 @@ $passwordLaporan = $stmt->fetchColumn();
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    function resetLaporan() {
-        $.ajax({
-            url: "fungsi/hapus/hapus.php?laporan=jual",
-            method: "GET",
-            success: function(response) {
-                $("#laporanContainer").html(response); // Update tampilan real-time
-                console.log("Laporan berhasil direset.");
-            },
-            error: function() {
-                console.log("Gagal mereset laporan.");
-            }
-        });
+     function resetLaporan() {
+        if (confirm("Apakah Anda yakin ingin mereset laporan?")) {
+            $.ajax({
+                url: "fungsi/hapus/hapus.php?laporan=jual",
+                method: "GET",
+                success: function(response) {
+                    // Tampilkan pesan sukses
+                    alert("Laporan berhasil direset.");
+                    // Reload halaman setelah reset
+                    location.reload(); // Ini akan memuat ulang halaman
+                },
+                error: function() {
+                    // Tampilkan pesan gagal
+                    alert("Gagal mereset laporan.");
+                }
+            });
+        }
     }
-   
-
 
     function showResetButton() {
         var password = prompt("Masukkan password untuk menampilkan tombol reset:");
@@ -265,7 +268,6 @@ $passwordLaporan = $stmt->fetchColumn();
             alert("Password salah!");
         }
     }
-
     // Hapus interval reset setiap 20 detik
     // setInterval(resetLaporan, 20000); // Hapus atau ubah ini jika tidak diperlukan
 </script>

@@ -106,6 +106,7 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
 
         <div class="footer">
             <p>Terima Kasih Telah Berbelanja di Toko Kami!</p>
+            <p>Catatan : jika terjadi keterlambatan pengembalian, barang rusak atau hilang akan dikenakan denda</p>
         </div>
     </div>
 

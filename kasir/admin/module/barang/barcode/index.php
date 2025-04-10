@@ -8,20 +8,12 @@ use Picqer\Barcode\BarcodeGeneratorPNG;
 // Fungsi untuk membuat barcode dengan format PNG
 function generateBarcode($code) {
     $generator = new BarcodeGeneratorPNG();
-    return base64_encode($generator->getBarcode($code, $generator::TYPE_CODE_128, 2, 50));
+    return $generator->getBarcode($code, $generator::TYPE_CODE_128, 2, 50);
 }
 
 // Fungsi untuk membuat barcode acak (minimal 8 digit)
 function generateRandomBarcode($length = 8) {
     return str_pad(rand(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
-}
-
-// Fungsi untuk memastikan barcode unik
-function ensureUniqueBarcode($config, $barcode) {
-    $sql = "SELECT COUNT(*) FROM barang WHERE kode_barcode = ?";
-    $stmt = $config->prepare($sql);
-    $stmt->execute([$barcode]);
-    return $stmt->fetchColumn() == 0; // Mengembalikan true jika barcode unik
 }
 
 $status = "";
@@ -44,14 +36,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (isset($_POST['create_barcode'])) {
-        do {
-            $kode_barcode = generateRandomBarcode();
-        } while (!ensureUniqueBarcode($config, $kode_barcode)); // Pastikan barcode unik
-
+        $kode_barcode = generateRandomBarcode();
         $sql = "UPDATE barang SET kode_barcode = ? WHERE id_barang = ?";
         $stmt = $config->prepare($sql);
         $stmt->execute([$kode_barcode, $id_barang]);
         $status = "<div class='alert alert-success'>✅ Kode Barcode berhasil dibuat: $kode_barcode</div>";
+    }
+
+    if (isset($_POST['download_barcode'])) {
+        $kode_barcode = trim($_POST['kode_barcode']);
+        $barcode_image = generateBarcode($kode_barcode);
+
+        // Mengatur header untuk mengunduh gambar
+        header('Content-Type: image/png');
+        header('Content-Disposition: attachment; filename="barcode.png"');
+        echo $barcode_image; // Kirim gambar ke browser
+        exit; // Hentikan eksekusi script setelah mengirim gambar
     }
 }
 
@@ -65,7 +65,7 @@ $all_barang = $config->query("SELECT * FROM barang")->fetchAll(PDO::FETCH_ASSOC)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Barang</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         table {
             width: 100%;
@@ -115,7 +115,7 @@ $all_barang = $config->query("SELECT * FROM barang")->fetchAll(PDO::FETCH_ASSOC)
                                     <?php 
                                         if (!empty($row['kode_barcode']) && is_numeric($row['kode_barcode'])) {
                                             echo "<br>";
-                                            echo '<img src="data:image/png;base64,' . generateBarcode($row['kode_barcode']) . '" class="barcode-image" alt="Barcode">';
+                                            echo '<img src="data:image/png;base64,' . base64_encode(generateBarcode($row['kode_barcode'])) . '" class="barcode-image" alt="Barcode">';
                                         } else {
                                             echo "<br><span class='text-danger'>Barcode tidak valid</span>";
                                         }
@@ -134,6 +134,10 @@ $all_barang = $config->query("SELECT * FROM barang")->fetchAll(PDO::FETCH_ASSOC)
                                         <input type="hidden" name="id_barang" value="<?= htmlspecialchars($row['id_barang']) ?>">
                                         <button type="submit" name="create_barcode" class="btn btn-info">Create Barcode</button>
                                     </form>
+                                    <form method="POST" style="display:inline-block;">
+                                        <input type="hidden" name="id_barang" value="<?= htmlspecialchars($row['id_barang']) ?>">
+                                        <input type="hidden" name="kode_barcode" value="<?= htmlspecialchars($row['kode_barcode']) ?>">
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -142,6 +146,8 @@ $all_barang = $config->query("SELECT * FROM barang")->fetchAll(PDO::FETCH_ASSOC)
             </div>
         </div>
     </div>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

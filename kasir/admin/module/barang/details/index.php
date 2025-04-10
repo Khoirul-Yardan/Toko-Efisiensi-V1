@@ -2,7 +2,7 @@
 	$id = $_GET['barang'];
 	$hasil = $lihat->barang_edit($id);
 ?>
-<a href="index.php?page=barang" class="btn btn-primary mb-3"><i class="fa fa-angle-left"></i> Balik </a>
+<a href="index.php?page=barang/gudang" class="btn btn-primary mb-3"><i class="fa fa-angle-left"></i> Balik </a>
 <h4>Details Barang</h4>
 
 <?php if(isset($_GET['success-stok'])){?>
