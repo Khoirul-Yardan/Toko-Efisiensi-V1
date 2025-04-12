@@ -28,26 +28,89 @@
     <title>Print Struk</title>
     <link rel="stylesheet" href="assets/css/bootstrap.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .container { width: 80mm; max-width: 100%; border: 1px solid #000; padding: 10px; box-sizing: border-box; }
-        .header { display: flex; align-items: center; }
-        .logo { width: 60px; margin-right: 10px; }
-        .store-info { flex-grow: 1; }
-        .text-center { text-align: center; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table td, .table th { border-bottom: 1px dashed black; padding: 3px; text-align: left; }
-        .footer { margin-top: 10px; text-align: center; font-size: 12px; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
 
-        @media print {
-            body { width: auto; }
-            .container { border: none; margin: 0; padding: 0; }
-            @page {
-                size: auto; /* auto is the initial value */
-                margin: 10mm; /* margin for the printed page */
-            }
-            .no-print { display: none; } /* Sembunyikan elemen yang tidak perlu saat dicetak */
+    .container {
+        width: 100%;
+        max-width: 80mm;
+        margin: auto;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #000;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo {
+        width: 60px;
+        margin-right: 10px;
+    }
+
+    .store-info {
+        flex-grow: 1;
+        font-size: 12px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .table td, .table th {
+        border-bottom: 1px dashed black;
+        padding: 3px;
+        text-align: left;
+    }
+
+    .footer {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    @media print {
+        body {
+            margin: 0;
+            padding: 0;
+            width: auto;
         }
-    </style>
+
+        .container {
+            border: none;
+            width: 100%;
+            max-width: none;
+            padding: 0;
+            margin: 0 auto;
+        }
+
+        @page {
+            size: auto; /* otomatis menyesuaikan panjang halaman */
+            margin: 10mm;
+        }
+
+        .table, .table tr, .table td, .table th {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .no-print {
+            display: none;
+        }
+    }
+</style>
+
 </head>
 <body>
     <script>window.print();</script>

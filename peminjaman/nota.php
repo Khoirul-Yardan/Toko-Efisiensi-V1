@@ -15,7 +15,6 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
     // Membuat kode transaksi otomatis
     $kode_transaksi = date("YmdHis"); // Format: YYYYMMDDHHMMSS
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -24,24 +23,107 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
     <title>Nota Peminjaman</title>
     <link rel="stylesheet" href="assets/css/bootstrap.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .container { width: 80mm; max-width: 100%; border: 1px solid #000; padding: 10px; box-sizing: border-box; }
-        .header { display: flex; align-items: center; margin-bottom: 10px; }
-        .logo { width: 60px; margin-right: 10px; }
-        .store-info { flex-grow: 1; }
-        .text-center { text-align: center; }
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        .table td, .table th { border-bottom: 1px dashed black; padding: 5px; text-align: left; }
-        .footer { margin-top: 10px; text-align: center; font-size: 12px; }
+        /* Definisikan variabel CSS */
+        :root {
+            --default-width: 90%;
+            --max-container-width: 80mm; /* Default untuk tampilan layar */
+        }
 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: var(--default-width);
+            max-width: var(--max-container-width);
+            margin: auto;
+            border: 1px solid #000;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 60px;
+            margin-right: 10px;
+        }
+
+        .store-info {
+            flex-grow: 1;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .table td, .table th {
+            border-bottom: 1px dashed black;
+            padding: 5px;
+            text-align: left;
+        }
+
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* CSS untuk tampilan cetak */
         @media print {
-            body { width: auto; }
-            .container { border: none; margin: 0; padding: 0; }
-            @page {
-                size: auto; /* auto is the initial value */
-                margin: 10mm; /* margin for the printed page */
+    html, body {
+        width: 80mm;
+        margin: 0;
+        padding: 0;
+        font-size: 11px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    .table th, .table td {
+        font-size: 10px;
+        padding: 4px 2px;
+    }
+
+    @page {
+        size: 80mm auto;
+        margin: 5mm;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    body::before, body::after {
+        display: none !important;
+    }
+}
+
+
+        /* Jika ingin menyesuaikan container untuk ukuran layar yang lebih besar */
+        @media (min-width: 768px) {
+            .container {
+                width: 80%;
             }
-            .no-print { display: none; } /* Sembunyikan elemen yang tidak perlu saat dicetak */
         }
     </style>
 </head>
@@ -61,12 +143,11 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
         
         <table class="table">
             <tr>
-                <th>ID Barang</th>
                 <th>Nama Barang</th>
                 <th>Jumlah</th>
                 <th>Harga</th>
                 <th>Total Harga</th>
-                <th>ID Peminjaman</th> <!-- Ganti Kode Unik menjadi ID Peminjaman -->
+                <th>ID Peminjaman</th>
                 <th>Tenggat Waktu</th>
             </tr>
             <?php 
@@ -77,7 +158,7 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
                 $tenggat_waktu = $row_peminjaman['tenggat_waktu'];
                 $id_peminjaman = $row_peminjaman['id']; // Ambil ID Peminjaman
 
-                // Fetch item details from kasir based on id_barang
+                // Fetch item details from kasir berdasarkan id_barang
                 $result_kasir = $conn->query("SELECT nama_barang, harga FROM kasir WHERE id_barang = '$id_barang'");
                 $row_kasir = $result_kasir->fetch_assoc();
 
@@ -85,17 +166,15 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
                     $nama_barang = $row_kasir['nama_barang'];
                     $harga = $row_kasir['harga'];
                     $total_harga = $harga * $jumlah;
-
-                    $grand_total += $total_harga; // Add to grand total
+                    $grand_total += $total_harga; // Tambahkan ke total keseluruhan
 
                     echo "<tr>";
-                    echo "<td>$id_barang</td>";
                     echo "<td>$nama_barang</td>";
                     echo "<td>$jumlah</td>";
                     echo "<td>Rp " . number_format($harga, 2, ',', '.') . "</td>";
                     echo "<td>Rp " . number_format($total_harga, 2, ',', '.') . "</td>";
-                    echo "<td>$id_peminjaman</td>"; // Display ID Peminjaman
-                    echo "<td>$tenggat_waktu</td>"; // Display tenggat waktu
+                    echo "<td>$id_peminjaman</td>"; 
+                    echo "<td>$tenggat_waktu</td>";
                     echo "</tr>";
                 }
             }
@@ -106,19 +185,27 @@ if ($result_peminjaman && $result_peminjaman->num_rows > 0) {
 
         <div class="footer">
             <p>Terima Kasih Telah Berbelanja di Toko Kami!</p>
-            <p>Catatan : jika terjadi keterlambatan pengembalian, barang rusak atau hilang akan dikenakan denda</p>
+            <p>Catatan: Jika terjadi keterlambatan pengembalian, barang rusak atau hilang akan dikenakan denda</p>
         </div>
     </div>
 
     <script>
-        // Menampilkan waktu saat ini secara real-time
+        // Tampilkan waktu saat ini secara real-time
         function updateTime() {
             const now = new Date();
-            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const options = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: false 
+            };
             document.getElementById('current-time').innerText = now.toLocaleString('id-ID', options);
         }
         setInterval(updateTime, 1000); // Update setiap detik
-        updateTime(); // Panggil fungsi untuk pertama kali
+        updateTime();
     </script>
 </body>
 </html>
